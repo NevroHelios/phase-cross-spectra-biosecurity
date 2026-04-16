@@ -1,0 +1,8 @@
+numpy>=2.4.4
+scipy>=1.17.1
+scikit-learn>=1.8.0
+biopython>=1.84
+pandas>=2.0
+matplotlib>=3.8
+tqdm>=4.66
+requests>=2.31

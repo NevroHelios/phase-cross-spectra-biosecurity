@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+.env
+
+# Data (large / sensitive)
+data/
+*.fasta
+*.fa
+*.fastq
+*.fq
+*.pkl
+*.pt
+*.npy
+*.npz
+*.parquet
+*.h5
+*.hdf5
+
+# Results (regenerate from code)
+results/*.csv
+results/*.pdf
+results/*.png
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MMseqs2 temp
+mmseqs_tmp/
+*.tar.gz
+
+# Secrets
+.env
+*.key
