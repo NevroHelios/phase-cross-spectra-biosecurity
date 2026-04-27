@@ -28,7 +28,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from src.encoding import voss_encode
 from src.fingerprint import phase_cross_spectral_fingerprint
-from src.evaluate import _get_split, bootstrap_ci
+from src.evaluate import _get_split, bootstrap_ci, wilcoxon_full
 from src.utils import load_dataset
 
 PAIRS = [(i, j) for i in range(4) for j in range(i + 1, 4)]
@@ -148,8 +148,8 @@ def run(csv_path: str, n_seeds: int = 20, C: float = 0.1) -> None:
         print(f"  W={W} coherence    : {cm:.4f} ± {cs:.4f}  "
               f"Δ = {cm-pm:+.4f}  CI=[{lo:.4f},{hi:.4f}]")
         if len(ph_aucs) >= 5:
-            _, p = wilcoxon(coh_aucs, ph_aucs, alternative="greater")
-            print(f"  Wilcoxon coherence > phase: p={p:.4f}")
+            wilcoxon_full(coh_aucs, ph_aucs,
+                          label=f"coherence > raw phase W={W}")
         print()
 
     # ── Exp B: multi-scale ───────────────────────────────────────────────────

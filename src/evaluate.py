@@ -150,17 +150,39 @@ def wilcoxon_greater(
     aucs_a: list[float],
     aucs_b: list[float],
 ) -> float:
-    """
-    Paired Wilcoxon signed-rank test: H₁ = aucs_a > aucs_b.
-
-    Args:
-        aucs_a: Per-seed AUROCs for method A (must align with aucs_b by seed).
-        aucs_b: Per-seed AUROCs for method B.
-
-    Returns:
-        p-value (one-sided).
-    """
+    """Paired Wilcoxon H₁: aucs_a > aucs_b. Returns p-value."""
     a, b = np.array(aucs_a), np.array(aucs_b)
     n = min(len(a), len(b))
     _, p = wilcoxon(a[:n], b[:n], alternative="greater")
     return float(p)
+
+
+def wilcoxon_full(
+    aucs_a: list[float],
+    aucs_b: list[float],
+    label: str = "",
+    alternative: str = "greater",
+) -> dict:
+    """
+    Paired Wilcoxon signed-rank test with W statistic and rank-biserial effect size.
+
+    Returns dict: W, p, Z, r, effect_size, n, label
+    """
+    from scipy import stats as _stats
+    a, b = np.array(aucs_a, dtype=float), np.array(aucs_b, dtype=float)
+    n = min(len(a), len(b))
+    method = "asymptotic" if n >= 10 else "exact"
+    result = wilcoxon(a[:n], b[:n], alternative=alternative, method=method)
+    W = float(result.statistic)
+    p = float(result.pvalue)
+    if hasattr(result, "zstatistic") and result.zstatistic is not None:
+        Z = float(result.zstatistic)
+    else:
+        Z = float(_stats.norm.ppf(1.0 - p)) if p < 1.0 else 0.0
+    r = Z / np.sqrt(n)
+    eff = ("large" if abs(r) >= 0.5 else
+           "medium" if abs(r) >= 0.3 else
+           "small" if abs(r) >= 0.1 else "negligible")
+    p_str = "p<0.0001" if p < 0.0001 else f"p={p:.4f}"
+    print(f"  Wilcoxon [{label}]: W={W:.0f}, {p_str}, Z={Z:.2f}, r={r:.2f} ({eff} effect)")
+    return dict(label=label, W=W, p=p, Z=Z, r=r, n=n, effect_size=eff)

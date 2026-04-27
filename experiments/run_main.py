@@ -23,7 +23,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from src.fingerprint import phase_cross_spectral_fingerprint
 from src.baseline import voss_power_fingerprint
-from src.evaluate import cluster_aware_eval, bootstrap_ci, wilcoxon_greater
+from src.evaluate import cluster_aware_eval, bootstrap_ci, wilcoxon_greater, wilcoxon_full
 from src.utils import load_dataset
 
 
@@ -112,10 +112,10 @@ def run(
 
     # ── Wilcoxon test ────────────────────────────────────────────────────────
     n_min = min(len(phase_aucs), len(voss_aucs))
-    p_val = wilcoxon_greater(phase_aucs[:n_min], voss_aucs[:n_min])
-    print(f"\n  Wilcoxon (phase > Voss): p = {p_val:.4f}")
-    if p_val < 0.01:
-        print("  → p < 0.01: phase cross-spectra SIGNIFICANTLY outperforms Voss")
+    wx = wilcoxon_full(phase_aucs[:n_min], voss_aucs[:n_min],
+                       label=f"phase > Voss W={W}")
+    if wx["p"] < 0.01:
+        print(f"  → p < 0.01: phase cross-spectra SIGNIFICANTLY outperforms Voss")
 
     # ── Save results ─────────────────────────────────────────────────────────
     if output_csv is None:
